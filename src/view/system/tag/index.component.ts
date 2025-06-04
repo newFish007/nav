@@ -12,7 +12,6 @@ import type { ITagPropValues } from 'src/types'
 import { updateFileContent } from 'src/api'
 import { TAG_PATH } from 'src/constants'
 import { tagList } from 'src/store'
-import { isSelfDevelop } from 'src/utils/utils'
 import { NzButtonModule } from 'ng-zorro-antd/button'
 import { NzInputModule } from 'ng-zorro-antd/input'
 import { NzTableModule } from 'ng-zorro-antd/table'
@@ -37,10 +36,9 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch'
 })
 export default class SystemTagComponent {
   readonly $t = $t
-  readonly isSelfDevelop = isSelfDevelop
-  tagList: ITagPropValues[] = tagList
+  tagList: ITagPropValues[] = tagList()
   submitting: boolean = false
-  incrementId = Math.max(...tagList.map((item) => Number(item.id))) + 1
+  incrementId = Math.max(...tagList().map((item) => Number(item.id))) + 1
 
   constructor(
     private message: NzMessageService,
@@ -145,7 +143,7 @@ export default class SystemTagComponent {
           path: TAG_PATH,
         })
           .then(() => {
-            this.message.success($t('_saveSuccess'))
+            this.message.success($t('_syncSuccessTip'))
           })
           .finally(() => {
             this.submitting = false

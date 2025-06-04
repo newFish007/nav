@@ -8,12 +8,12 @@ import { CommonModule } from '@angular/common'
 import { isLogin, getPermissions } from 'src/utils/user'
 import { copyText, getTextContent, randomColor, randomInt } from 'src/utils'
 import { parseHtmlWithContent, parseLoadingWithContent } from 'src/utils/utils'
-import { setWebsiteList } from 'src/utils/web'
-import type { INavProps, IWebProps, ICardType } from 'src/types'
+import { setNavs } from 'src/utils/web'
+import type { IWebProps, ICardType } from 'src/types'
 import { ActionType } from 'src/types'
 import { SearchType } from 'src/components/search/index'
 import { $t, isZhCN } from 'src/locale'
-import { settings, websiteList } from 'src/store'
+import { settings, navs } from 'src/store'
 import { JumpService } from 'src/services/jump'
 import { NzRateModule } from 'ng-zorro-antd/rate'
 import { LogoComponent } from 'src/components/logo/logo.component'
@@ -56,10 +56,9 @@ export class CardComponent {
   @ViewChild('root', { static: false }) root!: ElementRef
 
   readonly $t = $t
-  readonly settings = settings
-  readonly websiteList: INavProps[] = websiteList
+  readonly settings = settings()
   readonly isLogin = isLogin
-  readonly permissions = getPermissions(settings)
+  readonly permissions = getPermissions(settings())
   copyUrlDone = false
   copyPathDone = false
   description = ''
@@ -95,7 +94,7 @@ export class CardComponent {
     parseHtmlWithContent(this.root?.nativeElement, this.dataSource.desc)
   }
 
-  async copyUrl(e: Event, type: 1 | 2): Promise<void> {
+  async copyUrl(type: 1 | 2): Promise<void> {
     const { id, url } = this.dataSource
     let { href } = window.location
     href = href.split('?')[0]
@@ -103,12 +102,13 @@ export class CardComponent {
       href = href + '/'
     }
     const pathUrl = `${href}?q=${id}&type=${SearchType.Id}`
-    const isDone = await copyText(e, type === 1 ? pathUrl : url)
-
-    if (type === 1) {
-      this.copyPathDone = isDone
-    } else {
-      this.copyUrlDone = isDone
+    const isDone = await copyText(type === 1 ? pathUrl : url)
+    if (isDone) {
+      if (type === 1) {
+        this.copyPathDone = isDone
+      } else {
+        this.copyUrlDone = isDone
+      }
     }
   }
 
@@ -125,7 +125,7 @@ export class CardComponent {
 
   onRateChange(rate: number): void {
     this.dataSource.rate = rate
-    setWebsiteList(this.websiteList)
+    setNavs(navs())
   }
 
   async confirmDel(): Promise<void> {

@@ -22,11 +22,11 @@ import { NzFormModule } from 'ng-zorro-antd/form'
 import { NzInputModule } from 'ng-zorro-antd/input'
 import { NzSwitchModule } from 'ng-zorro-antd/switch'
 import { LogoComponent } from 'src/components/logo/logo.component'
-import { UploadComponent } from 'src/components/upload/index.component'
+import { UploadImageComponent } from 'src/components/upload-image/index.component'
 import { $t } from 'src/locale'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { websiteList } from 'src/store'
-import { setWebsiteList, updateByClass, pushDataByAny } from 'src/utils/web'
+import { navs } from 'src/store'
+import { setNavs, updateByClass, pushDataByAny } from 'src/utils/web'
 import { getClassById } from 'src/utils/index'
 import { getTempId, isSelfDevelop } from 'src/utils/utils'
 import event from 'src/utils/mitt'
@@ -40,7 +40,7 @@ import event from 'src/utils/mitt'
     NzInputModule,
     NzSwitchModule,
     LogoComponent,
-    UploadComponent,
+    UploadImageComponent,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -127,8 +127,11 @@ export class EditClassComponent {
           const ok = pushDataByAny(id, params)
           ok && this.message.success($t('_addSuccess'))
         } else {
-          websiteList.push(params as any)
-          setWebsiteList(websiteList)
+          navs.update((prev) => {
+            prev.push(params as any)
+            setNavs(prev)
+            return prev
+          })
         }
       }
     } catch (error: any) {
